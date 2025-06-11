@@ -2,11 +2,11 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# Set shell
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# We remove the problematic SHELL command. The default /bin/sh will be used.
 
-# Install build dependencies and Python
+# Install build dependencies, Python, and bash.
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
     build-essential \
     python3-dev \
     python3-pip \
