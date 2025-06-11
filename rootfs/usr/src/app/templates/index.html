@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Piper Voice Uploader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🗣️ Custom Piper Voice Uploader</h1>
+        <p>Upload your custom Piper voice model files (.onnx and .json).</p>
+        <p><strong>Note:</strong> Uploading new files will overwrite any existing model and reload the voice service.</p>
+        
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="onnx_file">Piper Model (.onnx)</label>
+                <input type="file" id="onnx_file" name="onnx_file" accept=".onnx" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="json_file">Model Config (.json)</label>
+                <input type="file" id="json_file" name="json_file" accept=".json" required>
+            </div>
+            
+            <button type="submit" id="submit-button">Upload Voice Model</button>
+        </form>
+        
+        <div id="status-message"></div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const statusDiv = document.getElementById('status-message');
+            const submitButton = document.getElementById('submit-button');
+
+            // Disable button and show loading text
+            submitButton.disabled = true;
+            submitButton.textContent = 'Uploading...';
+
+            statusDiv.className = 'status-info';
+            statusDiv.textContent = 'Uploading... Please wait.';
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    statusDiv.className = 'status-success';
+                } else {
+                    statusDiv.className = 'status-error';
+                }
+                statusDiv.textContent = result.message;
+
+            } catch (error) {
+                statusDiv.className = 'status-error';
+                statusDiv.textContent = 'An unexpected network error occurred. Check the add-on logs.';
+                console.error('Error:', error);
+            } finally {
+                // Re-enable the button
+                submitButton.disabled = false;
+                submitButton.textContent = 'Upload Voice Model';
+            }
+        });
+    </script>
+</body>
+</html>

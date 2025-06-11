@@ -1,0 +1,24 @@
+# /custom_piper_uploader/config.yaml
+name: "Custom Piper Voice Uploader"
+version: "1.0.1"
+slug: "custom_piper_uploader"
+description: "Upload and use your own custom Piper voice models with Wyoming."
+url: "https://github.com/your-github-username/ha-custom-piper-addon"
+arch:
+  - aarch64
+  - amd64
+init: false
+hassio_api: true
+hassio_role: default
+map:
+  - data:rw
+ingress: true
+panel_icon: mdi:voice
+ports:
+  80/tcp: 5000
+  10200/tcp: 10200
+ports_description:
+  80/tcp: "Web UI (Not needed for Ingress)"
+  10200/tcp: "Wyoming Protocol"
+options: {}
+schema: {}
