@@ -1,4 +1,3 @@
-# /custom_piper_uploader/README.md
 # Home Assistant Add-on: Custom Piper Voice Uploader
 
 This add-on allows you to upload your own custom-trained Piper voice models (`.onnx` and `.json` files) to Home Assistant and use them as a Text-to-Speech (TTS) engine via the Wyoming protocol.
