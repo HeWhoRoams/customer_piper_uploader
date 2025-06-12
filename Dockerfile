@@ -9,11 +9,11 @@ RUN apk add --no-cache \
     build-base \
     python3-dev \
     py3-pip \
-    espeak-ng
+    espeak-ng \
+    espeak-ng-dev # <-- ADDED THIS LINE: The development headers for espeak-ng
 
 # 'build-base' is the Alpine equivalent of 'build-essential'
 # 'py3-pip' ensures pip is available for the next step.
-# python3-venv is usually included with python3-dev on Alpine
 
 # Create and activate a virtual environment for Python packages
 RUN python3 -m venv /opt/venv
