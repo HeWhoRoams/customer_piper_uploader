@@ -1,25 +1,27 @@
 # /custom_piper_uploader/Dockerfile
+#
+# NEW: Specify the Debian base image explicitly. This is the key to the fix.
+# See: https://developers.home-assistant.io/docs/add-ons/base-images
 ARG BUILD_FROM
-FROM ${BUILD_FROM}
+FROM homeassistant/amd64-base-debian:bullseye
 
-# Use Alpine's package manager 'apk' instead of 'apt-get'
-# --no-cache is a best practice that updates, installs, and cleans up in one step.
-RUN apk add --no-cache \
+# Use Debian's package manager 'apt-get'
+RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
-    build-base \
+    build-essential \
     python3-dev \
-    py3-pip \
+    python3-pip \
+    python3-venv \
     espeak-ng \
-    espeak-ng-dev # <-- ADDED THIS LINE: The development headers for espeak-ng
-
-# 'build-base' is the Alpine equivalent of 'build-essential'
-# 'py3-pip' ensures pip is available for the next step.
+    espeak-ng-dev \
+    cmake \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create and activate a virtual environment for Python packages
 RUN python3 -m venv /opt/venv
 
 # Install Python dependencies into the virtual environment
-# We need to explicitly activate the venv for the RUN command to use it.
 RUN . /opt/venv/bin/activate && \
     pip install --no-cache-dir \
         flask \
