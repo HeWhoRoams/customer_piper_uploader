@@ -1,5 +1,3 @@
-# /custom_piper_uploader/Dockerfile
-
 # =====================================================================
 # Stage 1: The Builder
 # =====================================================================
@@ -19,15 +17,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# THE DEFINITIVE FIX: Based on the 5 Whys analysis, this is the correct
-# path for packages installed by the non-root 'piper' user inside the
-# builder image. The wildcard (*) makes it future-proof.
-ENV PYTHON_PACKAGES_PATH=/home/piper/.local/lib/python3*/site-packages
+# THE VERIFIED FIX: The builder image installs packages to the global
+# system path for Python 3.9. This is the correct path.
+ENV PYTHON_PACKAGES_PATH=/usr/lib/python3.9/site-packages
+ENV PYTHON_BIN_PATH=/usr/local/bin/
 
 # Copy the installed python packages and executables from the
-# verified locations in the builder stage.
-COPY --from=builder ${PYTHON_PACKAGES_PATH} /usr/local/lib/python3.9/site-packages
-COPY --from=builder /home/piper/.local/bin/ /usr/local/bin/
+# verified locations in the builder stage to the final system path.
+COPY --from=builder ${PYTHON_PACKAGES_PATH} ${PYTHON_PACKAGES_PATH}
+COPY --from=builder ${PYTHON_BIN_PATH} ${PYTHON_BIN_PATH}
 
 # Install flask for our web UI
 RUN pip3 install --no-cache-dir flask
