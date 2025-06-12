@@ -2,9 +2,9 @@
 
 # =====================================================================
 # Stage 1: The Builder
-# Use a specific, stable version of the official piper image.
+# THE FIX IS HERE: Use a real, existing version tag.
 # =====================================================================
-FROM rhasspy/wyoming-piper:1.5.2 as builder
+FROM rhasspy/wyoming-piper:1.5.1 as builder
 
 # =====================================================================
 # Stage 2: The Final Add-on
@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # The piper image uses Python 3.11. The packages are here:
 ENV PYTHON_PACKAGES_PATH=/usr/local/lib/python3.11/site-packages
 
-# The key fix: Copy the installed python packages and executables
+# Copy the installed python packages and executables
 # from the correct locations in the builder stage.
 COPY --from=builder ${PYTHON_PACKAGES_PATH} ${PYTHON_PACKAGES_PATH}
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
