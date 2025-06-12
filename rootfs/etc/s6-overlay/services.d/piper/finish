@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bashio
+
+# This script runs when the 'run' script for this service exits.
+# We're just logging a message.
+bashio::log.info "Piper service has stopped."
