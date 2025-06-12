@@ -1,5 +1,24 @@
 # /custom_piper_uploader/config.yaml
 name: "Custom Piper Voice Uploader"
-version: "2.0.1" # Patch for the correct installation path
+version: "2.0.1" # New major version for the version-agnostic build
 slug: "custom_piper_uploader"
-# ... rest of the file is the same ...
+description: "Upload and use your own custom Piper voice models with Wyoming."
+url: "https://github.com/HeWhoRoams/customer_piper_uploader"
+arch:
+  - aarch64
+  - amd64
+init: false
+hassio_api: true
+hassio_role: default
+map:
+  - data:rw
+ingress: true
+panel_icon: mdi:voice
+ports:
+  80/tcp: 5000
+  10200/tcp: 10200
+ports_description:
+  80/tcp: "Web UI (Not needed for Ingress)"
+  10200/tcp: "Wyoming Protocol"
+options: {}
+schema: {}
