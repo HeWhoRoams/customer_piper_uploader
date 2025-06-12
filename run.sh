@@ -1,16 +1,14 @@
 #!/usr/bin/with-contenv bashio
 # /custom_piper_uploader/run.sh
 
-# Define the python executable from our virtual environment
-VENV_PYTHON="/opt/venv/bin/python3"
+# No virtual environment needed, we use the system's python3
 
-# Create directory for models if it doesn't exist
 MODEL_DIR="/data/piper-models"
 mkdir -p "${MODEL_DIR}"
 
 bashio::log.info "Starting the Flask web server for file uploads..."
-# Start the Flask app using the venv's python
-"${VENV_PYTHON}" /usr/src/app/app.py &
+# Start the Flask app using the system python
+python3 /usr/src/app/app.py &
 
 # Wait for a model to be uploaded
 while true; do
@@ -31,8 +29,8 @@ done
 
 bashio::log.info "Starting Piper with the custom voice..."
 
-# The PATH is already set up inside the venv, so we can call piper directly
-# using the venv's python executable.
-exec "${VENV_PYTHON}" -m wyoming_piper \
+# The 'wyoming-piper' executable was copied to /usr/local/bin,
+# so it's in our PATH and can be called directly.
+exec wyoming-piper \
     --voice "${ONNX_FILE}" \
     --uri "tcp://0.0.0.0:10200"
