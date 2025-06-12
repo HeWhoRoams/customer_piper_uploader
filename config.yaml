@@ -1,9 +1,9 @@
 # /custom_piper_uploader/config.yaml
 name: "Custom Piper Voice Uploader"
-version: "1.0.2"
+version: "1.0.4" # <-- The version number is updated again
 slug: "custom_piper_uploader"
 description: "Upload and use your own custom Piper voice models with Wyoming."
-url: "https://github.com/your-github-username/ha-custom-piper-addon"
+url: "https://github.com/HeWhoRoams/custom_voice_HA_piper_uploader"
 arch:
   - aarch64
   - amd64
