@@ -1,1 +1,26 @@
 
+#!/usr/bin/with-contenv bashio
+
+MODEL_DIR="/data/piper-models"
+mkdir -p "${MODEL_DIR}"
+
+while true; do
+    ONNX_FILE=$(find "${MODEL_DIR}" -name "*.onnx" -print -quit)
+    JSON_FILE=$(find "${MODEL_DIR}" -name "*.json" -print -quit)
+
+    if [[ -f "${ONNX_FILE}" && -f "${JSON_FILE}" ]]; then
+        bashio::log.info "Found voice model, starting Piper..."
+        bashio::log.info "ONNX: ${ONNX_FILE}"
+        
+        # This is the main Piper process.
+        # If it ever exits, S6 will restart this script.
+        exec wyoming-piper \
+            --voice "${ONNX_FILE}" \
+            --uri "tcp://0.0.0.0:10200"
+
+    else
+        bashio::log.info "No voice model found. Waiting for upload..."
+        # Sleep for 30 seconds before checking again.
+        sleep 30
+    fi
+done
