@@ -29,8 +29,7 @@ done
 
 bashio::log.info "Starting Piper with the custom voice..."
 
-# The 'wyoming-piper' executable was copied to /usr/local/bin,
-# so it's in our PATH and can be called directly.
+# The 'wyoming-piper' executable is in the PATH of the base image.
 exec wyoming-piper \
     --voice "${ONNX_FILE}" \
     --uri "tcp://0.0.0.0:10200"
