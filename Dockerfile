@@ -1,38 +1,40 @@
 # /custom_piper_uploader/Dockerfile
+
+# =====================================================================
+# Stage 1: The Builder
+# We use the official, pre-built wyoming-piper image. It contains all
+# the compiled files we need, saving us from the errors.
+# =====================================================================
+FROM rhasspy/wyoming-piper:latest as builder
+
+# =====================================================================
+# Stage 2: The Final Add-on
+# We start from the standard Home Assistant base image, as required.
+# =====================================================================
 ARG BUILD_FROM
-# Using the Debian base image, which is the correct long-term solution.
 FROM homeassistant/amd64-base-debian:bullseye
 
-# Use Debian's package manager 'apt-get'
+# Install only the absolute minimum RUNTIME dependencies.
+# No -dev, no build-essential, no cmake needed!
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash \
-    build-essential \
-    python3-dev \
-    python3-pip \
-    python3-venv \
     espeak-ng \
-    libespeak-ng-dev \
-    cmake \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# The above line is fixed. The incorrect 'espeak-ng-dev' has been
-# replaced with the correct Debian package name: 'libespeak-ng-dev'
+# The key step: Copy the entire pre-compiled Virtual Environment
+# from the 'builder' stage into our final image. This contains
+# a working python, piper, onnxruntime, etc.
+COPY --from=builder /opt/venv /opt/venv
 
-# Create and activate a virtual environment for Python packages
-RUN python3 -m venv /opt/venv
-
-# Install Python dependencies into the virtual environment
+# Our add-on also needs the 'flask' library for the web UI.
+# Let's install it into the virtual environment we just copied.
 RUN . /opt/venv/bin/activate && \
-    pip install --no-cache-dir \
-        flask \
-        wyoming-piper \
-        espeak-ng-phonemizer
+    pip install --no-cache-dir flask
 
-# Copy rootfs contents to the image
+# Copy our own add-on files (web server, run script)
 COPY rootfs/ /
 
-# Make run.sh executable
+# Make our run script executable
 RUN chmod +x /run.sh
 
 CMD [ "/run.sh" ]
