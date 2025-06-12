@@ -1,4 +1,40 @@
 #!/usr/bin/with-contenv bashio
 
-bashio::log.info "Starting the Flask web server for file uploads..."
-exec python3 /usr/src/app/app.py
+MODEL_DIR="/data/piper-models"
+mkdir -p "${MODEL_DIR}"
+
+bashio::log.info "Piper service started. Monitoring for models..."
+
+while true; do
+    # Use simple globbing to find the first .onnx file. Much safer than 'find'.
+    onnx_files=("${MODEL_DIR}"/*.onnx)
+    ONNX_FILE="${onnx_files[0]}"
+
+    # Check if a file was actually found and it is a real file.
+    if [[ -f "${ONNX_FILE}" ]]; then
+        # Assume the .json file has the same name.
+        JSON_FILE="${ONNX_FILE}.json"
+
+        if [[ -f "${JSON_FILE}" ]]; then
+            bashio::log.info "Found model and config, starting Piper..."
+            bashio::log.info "Voice: ${ONNX_FILE}"
+            
+            # This is the main Piper process. If it exits, this script will loop again.
+            exec wyoming-piper \
+                --voice "${ONNX_FILE}" \
+                --uri "tcp://0.0.0.0:10200"
+            
+            # The script will only get here if 'exec' fails.
+            bashio::log.error "Failed to start wyoming-piper. Retrying in 30 seconds."
+
+        else
+            bashio::log.warning "Found ONNX file but missing corresponding JSON: ${JSON_FILE}"
+            bashio::log.warning "Waiting for both files to be present..."
+        fi
+    else
+        # This is the normal state before a model is uploaded.
+        bashio::log.info "No voice model found. Checking again in 30 seconds."
+    fi
+
+    sleep 30
+done
