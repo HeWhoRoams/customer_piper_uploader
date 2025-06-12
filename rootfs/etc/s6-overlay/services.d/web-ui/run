@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv bashio
+
+bashio::log.info "Starting the Flask web server for file uploads..."
+exec python3 /usr/src/app/app.py
