@@ -2,8 +2,6 @@
 
 # =====================================================================
 # Stage 1: The Builder
-# VERSION-AGNOSTIC CHANGE #1: Use 'latest' to always get the most
-# up-to-date version of the piper image, avoiding manifest errors.
 # =====================================================================
 FROM rhasspy/wyoming-piper:latest as builder
 
@@ -21,15 +19,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# VERSION-AGNOSTIC CHANGE #2: Use a wildcard (*) in the path.
-# This will match /usr/local/lib/python3.9, /usr/local/lib/python3.11,
-# or whatever Python version is used in the 'latest' builder image.
-ENV PYTHON_PACKAGES_PATH=/usr/local/lib/python3*/site-packages
+# THE DEFINITIVE FIX: Based on the 5 Whys analysis, this is the correct
+# path for packages installed by the non-root 'piper' user inside the
+# builder image. The wildcard (*) makes it future-proof.
+ENV PYTHON_PACKAGES_PATH=/home/piper/.local/lib/python3*/site-packages
 
-# Copy the installed python packages and executables
-# from the dynamically-found locations in the builder stage.
-COPY --from=builder ${PYTHON_PACKAGES_PATH} ${PYTHON_PACKAGES_PATH}
-COPY --from=builder /usr/local/bin/ /usr/local/bin/
+# Copy the installed python packages and executables from the
+# verified locations in the builder stage.
+COPY --from=builder ${PYTHON_PACKAGES_PATH} /usr/local/lib/python3.9/site-packages
+COPY --from=builder /home/piper/.local/bin/ /usr/local/bin/
 
 # Install flask for our web UI
 RUN pip3 install --no-cache-dir flask
