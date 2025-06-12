@@ -2,9 +2,9 @@
 
 # =====================================================================
 # Stage 1: The Builder
-# THE FIX IS HERE: Use a real, existing version tag.
+# THE FIX IS HERE: Using version 1.5.4, which you verified exists.
 # =====================================================================
-FROM rhasspy/wyoming-piper:1.5.1 as builder
+FROM rhasspy/wyoming-piper:1.5.4 as builder
 
 # =====================================================================
 # Stage 2: The Final Add-on
