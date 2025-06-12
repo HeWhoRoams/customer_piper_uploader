@@ -2,27 +2,29 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# We remove the problematic SHELL command. The default /bin/sh will be used.
-
-# Install build dependencies, Python, and bash.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Use Alpine's package manager 'apk' instead of 'apt-get'
+# --no-cache is a best practice that updates, installs, and cleans up in one step.
+RUN apk add --no-cache \
     bash \
-    build-essential \
+    build-base \
     python3-dev \
-    python3-pip \
-    python3-venv \
-    espeak-ng \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    py3-pip \
+    espeak-ng
 
-# Install Piper and Wyoming dependencies into a virtual environment
-RUN python3 -m venv /opt/venv && \
-    . /opt/venv/bin/activate && \
+# 'build-base' is the Alpine equivalent of 'build-essential'
+# 'py3-pip' ensures pip is available for the next step.
+# python3-venv is usually included with python3-dev on Alpine
+
+# Create and activate a virtual environment for Python packages
+RUN python3 -m venv /opt/venv
+
+# Install Python dependencies into the virtual environment
+# We need to explicitly activate the venv for the RUN command to use it.
+RUN . /opt/venv/bin/activate && \
     pip install --no-cache-dir \
         flask \
         wyoming-piper \
-        espeak-ng-phonemizer && \
-    deactivate
+        espeak-ng-phonemizer
 
 # Copy rootfs contents to the image
 COPY rootfs/ /
