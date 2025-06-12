@@ -1,5 +1,5 @@
 name: "Custom Piper Voice Uploader"
-version: "2.0.2"
+version: "3.0.0"
 slug: "custom_piper_uploader"
 description: "Upload and use your own custom Piper voice models with Wyoming."
 url: "https://github.com/HeWhoRoams/customer_piper_uploader"
